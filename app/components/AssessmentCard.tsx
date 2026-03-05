@@ -34,6 +34,7 @@ export function AssessmentCard({
     Partial<Record<MetricKey, boolean>>
   >({});
   const [isMonitoring, setIsMonitoring] = useState(false);
+  const [isReloading, setIsReloading] = useState(false);
 
   const toggleMetric = (key: MetricKey) => {
     const currentEnabled =
@@ -51,8 +52,18 @@ export function AssessmentCard({
     setIsMonitoring(false);
   };
 
+  const handleReloadClick = async () => {
+    if (isReloading) {
+      return;
+    }
+
+    setIsReloading(true);
+    await new Promise((resolve) => setTimeout(resolve, 700));
+    setIsReloading(false);
+  };
+
   return (
-    <article className="border-card-border rounded-xl border px-3.5 py-2.5 bg-card-background">
+    <article className="border-card-border rounded-xl border px-3.5 pt-2.5 bg-card-background">
       <div className="grid grid-cols-[minmax(20rem,1.5fr)_auto_auto_auto] items-center gap-2.5 max-lg:grid-cols-1">
         <div className="grid grid-cols-3">
           <div className="flex items-center gap-4">
@@ -136,7 +147,7 @@ export function AssessmentCard({
           ))}
 
           <div
-            className="text-body text-card-muted inline-flex shrink-0 items-center justify-center gap-1 px-2 py-1.5 max-lg:justify-start"
+            className="text-body text-card-muted inline-flex shrink-0 items-center justify-center gap-1 px-2 py-0 max-lg:justify-start"
             aria-label="Peer interactions"
           >
             <Image
@@ -145,12 +156,22 @@ export function AssessmentCard({
               width={16}
               height={16}
             />
-            <Image
-              src="/icons/reload.svg"
-              alt="Refresh"
-              width={16}
-              height={16}
-            />
+            <button
+              type="button"
+              className="inline-flex h-4 w-4 cursor-pointer items-center justify-center border-0 bg-transparent p-0"
+              onClick={handleReloadClick}
+              disabled={isReloading}
+              aria-label="Reload metric status"
+              aria-busy={isReloading}
+            >
+              <Image
+                src="/icons/reload.svg"
+                alt="Refresh"
+                width={16}
+                height={16}
+                className={isReloading ? "animate-spin" : ""}
+              />
+            </button>
             <span>{subparts.peerCount}</span>
           </div>
         </div>

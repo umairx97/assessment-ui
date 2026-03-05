@@ -10,7 +10,7 @@ const plusJakartaSans = Plus_Jakarta_Sans({
 });
 
 export const metadata: Metadata = {
-  title: "Lessons and Formative Quizzes",
+  title: "Assessment Dashboard",
   description: "Lessons and formative quizzes dashboard",
 };
 

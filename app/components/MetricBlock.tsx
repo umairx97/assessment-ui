@@ -49,10 +49,10 @@ export function MetricBlock({
 
   return (
     <div
-      className={`border-card-divider min-w-0 border-r px-3 py-2 last:border-r-0 max-lg:border-r-0 ${className ?? ""}`}
+      className={`border-card-divider min-w-0 border-r px-3 pt-0.5 pb-0 last:border-r-0 max-lg:border-r-0 ${className ?? ""}`}
     >
       <div
-        className={`grid min-h-17 items-center gap-x-2 ${
+        className={`grid min-h-14 items-center gap-x-2 ${
           showMastery ? "grid-cols-12" : "grid-cols-10"
         }`}
       >
@@ -72,7 +72,7 @@ export function MetricBlock({
           />
         </button>
 
-        <div className="col-span-4 min-w-0">
+        <div className={`${showMastery ? "col-span-3" : "col-span-4"} min-w-0`}>
           <div
             className={`${trackBg} h-3 min-w-0 overflow-hidden rounded-full`}
             role="progressbar"
@@ -91,11 +91,11 @@ export function MetricBlock({
             />
           </div>
 
-          <div className="text-body text-[12px] text-card-muted mt-1 text-center leading-none">{`${metric.correct} / ${metric.total}`}</div>
+          <div className="text-body text-[12px] text-card-muted mt-0.5 text-center leading-none">{`${metric.correct} / ${metric.total}`}</div>
         </div>
 
         {showMastery && (
-          <div className="col-span-2 min-w-0">
+          <div className="col-span-3 min-w-0">
             <div
               className={`${trackBg} h-3 w-full overflow-hidden rounded-full`}
               role="progressbar"
@@ -114,7 +114,7 @@ export function MetricBlock({
               />
             </div>
 
-            <div className="text-body text-[12px] text-card-muted mt-1 text-center leading-none">{`${metric.percent}%`}</div>
+            <div className="text-body text-[12px] text-card-muted mt-0.5 text-center leading-none">{`${metric.percent}%`}</div>
           </div>
         )}
       </div>

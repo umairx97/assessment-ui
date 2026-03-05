@@ -1,18 +1,23 @@
+import { SubpartsSkeleton } from "./SubpartsSkeleton";
+
 export function AssessmentSkeleton() {
   return (
     <article
-      className="border-card-border bg-background grid gap-2 rounded-xl border px-3.5 py-2.5"
+      className="border-card-border rounded-xl border px-3.5 pt-2.5 bg-card-background"
       aria-hidden
     >
-      <div className="bg-card-skeleton h-3 w-[30%] animate-pulse rounded-full motion-reduce:animate-none" />
-      <div className="bg-card-skeleton h-3 w-[45%] animate-pulse rounded-full motion-reduce:animate-none" />
-      <div className="bg-card-skeleton h-3 w-[88%] animate-pulse rounded-full motion-reduce:animate-none" />
-      <div className="mt-1 grid grid-cols-4 gap-2">
-        <div className="bg-card-skeleton h-4 animate-pulse rounded-full motion-reduce:animate-none" />
-        <div className="bg-card-skeleton h-4 animate-pulse rounded-full motion-reduce:animate-none" />
-        <div className="bg-card-skeleton h-4 animate-pulse rounded-full motion-reduce:animate-none" />
-        <div className="bg-card-skeleton h-4 animate-pulse rounded-full motion-reduce:animate-none" />
+      <div className="grid grid-cols-[minmax(20rem,1.5fr)_auto_auto_auto] items-center gap-2.5 max-lg:grid-cols-1">
+        <div className="grid grid-cols-3">
+          <div className="bg-card-skeleton h-4 w-3/4 animate-pulse rounded-full motion-reduce:animate-none" />
+          <div className="bg-card-skeleton h-4 w-2/3 animate-pulse rounded-full motion-reduce:animate-none" />
+        </div>
+
+        <div className="bg-card-skeleton h-9 min-w-24 animate-pulse rounded-full motion-reduce:animate-none" />
       </div>
+
+      <div className="bg-card-skeleton mt-2 mb-2.5 ml-7 h-3.5 w-11/12 animate-pulse rounded-full motion-reduce:animate-none" />
+
+      <SubpartsSkeleton />
     </article>
   );
 }
