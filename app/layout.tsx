@@ -1,3 +1,4 @@
+import classNames from "classnames";
 import type { Metadata } from "next";
 import { Plus_Jakarta_Sans } from "next/font/google";
 import { Providers } from "./providers";
@@ -19,9 +20,11 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const bodyClasses = classNames(plusJakartaSans.variable, "antialiased");
+
   return (
     <html lang="en">
-      <body className={`${plusJakartaSans.variable} antialiased`}>
+      <body className={bodyClasses}>
         <Providers>{children}</Providers>
       </body>
     </html>

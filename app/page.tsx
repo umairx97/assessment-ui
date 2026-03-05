@@ -1,6 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
+import classNames from "classnames";
 import Image from "next/image";
 import { useMemo, useState } from "react";
 import { AssessmentCard } from "./components/AssessmentCard";
@@ -61,14 +62,42 @@ export default function Home() {
     });
   }, [quizzes, query, sortBy]);
 
+  const mainClasses = classNames("min-h-screen px-5 py-4 bg-white!");
+  const sectionClasses = classNames("mx-auto max-w-7xl bg-white");
+  const headerClasses = classNames(
+    "mb-3 grid grid-cols-[1fr_auto_auto] items-center max-xl:grid-cols-1",
+  );
+  const headerRowClasses = classNames(
+    "flex items-center justify-between gap-4 flex-wrap",
+  );
+  const guideButtonClasses = classNames(
+    "border-guide-border text-guide-text text-label flex items-center gap-2 rounded-xl border border-dashed bg-white px-3 py-2",
+  );
+  const controlsRowClasses = classNames("gap-4 flex items-end");
+  const searchLabelClasses = classNames("relative flex gap-2");
+  const searchIconClasses = classNames(
+    "text-search-icon text-body absolute top-1/2 left-3 -translate-y-1/2",
+  );
+  const searchInputClasses = classNames(
+    "border-field-border text-field-text text-label h-control-h w-control-w rounded-lg border bg-white pr-3.5 pl-2",
+  );
+  const sortSelectClasses = classNames(
+    "border-field-border bg-white text-field-text text-label h-control-h w-control-w rounded-lg border px-2.5",
+  );
+  const listContainerClasses = classNames("relative");
+  const listClasses = classNames(
+    "mt-10 grid max-h-list-max-h gap-2.5 overflow-y-auto pr-1",
+  );
+  const errorTextClasses = classNames("text-body text-danger");
+
   return (
     <main
-      className="min-h-screen px-5 py-4 bg-white!"
+      className={mainClasses}
       style={{ backgroundColor: colors.secondary.gray }}
     >
-      <section className="mx-auto max-w-7xl bg-white">
-        <header className="mb-3 grid grid-cols-[1fr_auto_auto] items-center max-xl:grid-cols-1">
-          <div className="flex items-center justify-between gap-4 flex-wrap">
+      <section className={sectionClasses}>
+        <header className={headerClasses}>
+          <div className={headerRowClasses}>
             <div>
               <div className="flex gap-4 items-center">
                 <h1 className="text-xl leading-[1.15] font-bold">
@@ -86,37 +115,28 @@ export default function Home() {
               </p>
             </div>
 
-            <button
-              className="border-guide-border text-guide-text text-label flex items-center gap-2 rounded-xl border border-dashed bg-white px-3 py-2"
-              type="button"
-            >
+            <button className={guideButtonClasses} type="button">
               <Image src="/icons/bulb.svg" alt="Guide" width={16} height={16} />
               <span className="max-w-48 text-left leading-[1.2]">
                 Lessons &amp; Formative Quizzes Guide
               </span>
             </button>
 
-            <div className="gap-4 flex items-end">
-              <label
-                className="relative flex gap-2"
-                htmlFor="search-assessment"
-              >
+            <div className={controlsRowClasses}>
+              <label className={searchLabelClasses} htmlFor="search-assessment">
                 <Image
                   src="/icons/search.svg"
                   alt="Search"
                   width={16}
                   height={16}
                 />
-                <span
-                  aria-hidden
-                  className="text-search-icon text-body absolute top-1/2 left-3 -translate-y-1/2"
-                ></span>
+                <span aria-hidden className={searchIconClasses}></span>
                 <input
                   id="search-assessment"
                   value={query}
                   onChange={(event) => setQuery(event.target.value)}
                   placeholder="Search"
-                  className="border-field-border text-field-text text-label h-control-h w-control-w rounded-lg border bg-white pr-3.5 pl-2"
+                  className={searchInputClasses}
                 />
               </label>
 
@@ -128,7 +148,7 @@ export default function Home() {
                   onChange={(event) =>
                     setSortBy(event.target.value as "scheduled" | "activity")
                   }
-                  className="border-field-border bg-white text-field-text text-label h-control-h w-control-w rounded-lg border px-2.5"
+                  className={sortSelectClasses}
                 >
                   <option value="scheduled">Sort By Scheduled</option>
                   <option value="activity">Sort By Last Activity</option>
@@ -138,12 +158,8 @@ export default function Home() {
           </div>
         </header>
 
-        <div className="relative">
-          <div
-            className="mt-10 grid max-h-list-max-h gap-2.5 overflow-y-auto pr-1"
-            role="list"
-            aria-live="polite"
-          >
+        <div className={listContainerClasses}>
+          <div className={listClasses} role="list" aria-live="polite">
             {isQuizzesLoading && (
               <>
                 <AssessmentSkeleton />
@@ -153,7 +169,7 @@ export default function Home() {
             )}
 
             {!isQuizzesLoading && isQuizzesError && (
-              <p className="text-body text-danger">Could not load quiz list.</p>
+              <p className={errorTextClasses}>Could not load quiz list.</p>
             )}
 
             {!isQuizzesLoading &&
@@ -172,7 +188,7 @@ export default function Home() {
               !isQuizzesError &&
               !isSubpartsLoading &&
               isSubpartsError && (
-                <p className="text-body text-danger">
+                <p className={errorTextClasses}>
                   Could not load quiz subparts.
                 </p>
               )}

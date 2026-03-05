@@ -1,3 +1,4 @@
+import classNames from "classnames";
 import Image from "next/image";
 import { useState } from "react";
 import { metricGroups } from "../constants/quiz";
@@ -61,6 +62,14 @@ export function AssessmentCard({
     await new Promise((resolve) => setTimeout(resolve, 700));
     setIsReloading(false);
   };
+
+  const peerContainerClasses = classNames(
+    "text-body text-card-muted inline-flex shrink-0 items-center justify-center gap-1 px-2 py-0 max-lg:justify-start",
+  );
+
+  const reloadIconClasses = classNames({
+    "animate-spin": isReloading,
+  });
 
   return (
     <article className="border-card-border rounded-xl border px-3.5 pt-2.5 bg-card-background">
@@ -134,7 +143,9 @@ export function AssessmentCard({
             <MetricBlock
               key={group.key}
               label={group.label}
-              className={`flex-1 ${group.key === "formative" ? "border-r-0" : ""}`}
+              className={classNames("flex-1", {
+                "border-r-0": group.key === "formative",
+              })}
               metric={{
                 ...metricValues[group.key],
                 enabled:
@@ -146,10 +157,7 @@ export function AssessmentCard({
             />
           ))}
 
-          <div
-            className="text-body text-card-muted inline-flex shrink-0 items-center justify-center gap-1 px-2 py-0 max-lg:justify-start"
-            aria-label="Peer interactions"
-          >
+          <div className={peerContainerClasses} aria-label="Peer interactions">
             <Image
               src="/icons/person.svg"
               alt="People"
@@ -169,7 +177,7 @@ export function AssessmentCard({
                 alt="Refresh"
                 width={16}
                 height={16}
-                className={isReloading ? "animate-spin" : ""}
+                className={reloadIconClasses}
               />
             </button>
             <span>{subparts.peerCount}</span>

@@ -1,4 +1,4 @@
-# Lessons and Formative Quizzes
+# Assessment Dashboard
 
 Single-page Next.js dashboard that renders quiz cards from mock APIs, with split-loading behavior for card headers and metric subparts.
 
@@ -18,6 +18,7 @@ Single-page Next.js dashboard that renders quiz cards from mock APIs, with split
 - Tailwind CSS v4 (tokenized via theme variables)
 - @tanstack/react-query
 - axios
+- classnames
 - next/font (Plus Jakarta Sans)
 
 ## Quick start
@@ -118,6 +119,7 @@ Both split endpoints derive from the same canonical dataset to prevent data drif
 ## Styling conventions
 
 - Tailwind-first styling in component className strings.
+- classnames is used to compose and conditionally apply utility classes.
 - Theme tokens are defined in app/globals.css via @theme inline.
 - Reuse semantic tokens (for example text-body, text-label, color tokens) instead of one-off values.
 - Font is configured in layout.tsx through Plus Jakarta Sans and exposed as a CSS variable.
@@ -128,8 +130,13 @@ Both split endpoints derive from the same canonical dataset to prevent data drif
 - Sort by scheduled date or last activity.
 - Metric toggles are independent per card/metric cell.
 - Monitor button has a loading state.
+- Reload icon includes a press-to-spin loading animation.
 - Progress bars animate on load and respect reduced motion.
 - Lesson metric can hide mastery bar where required by the design.
+
+## App metadata
+
+- Browser/document title is set to “Assessment Dashboard” in app/layout.tsx.
 
 ## How to make common changes
 
