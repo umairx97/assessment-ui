@@ -80,8 +80,8 @@ export function AssessmentCard({
               <Image
                 src="/icons/muscles.svg"
                 alt="Strength indicator"
-                width={16}
-                height={16}
+                width={18}
+                height={18}
               />
             )}
           </div>
@@ -90,15 +90,15 @@ export function AssessmentCard({
               <Image
                 src="/icons/calendar.svg"
                 alt="Calendar"
-                width={18}
-                height={18}
+                width={20}
+                height={20}
               />
-              <div className="text-body text-card-muted leading-[1.1]">
+              <div className="text-body text-card-muted">
                 {quiz.scheduledDate ?? "Not Scheduled"}
               </div>
             </div>
 
-            <div className="text-body text-card-muted text-center leading-[1.1]">
+            <div className="text-body text-card-muted text-center">
               <div>Last Activity</div>
               <div>{quiz.lastActivity}</div>
             </div>

@@ -68,7 +68,7 @@ export default function Home() {
     >
       <section className="mx-auto max-w-7xl bg-white">
         <header className="mb-3 grid grid-cols-[1fr_auto_auto] items-center max-xl:grid-cols-1">
-          <div className="flex items-center justify-between gap-4">
+          <div className="flex items-center justify-between gap-4 flex-wrap">
             <div>
               <div className="flex gap-4 items-center">
                 <h1 className="text-xl leading-[1.15] font-bold">
