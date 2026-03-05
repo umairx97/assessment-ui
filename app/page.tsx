@@ -71,14 +71,14 @@ function MetricBlock({ label, metric }: { label: string; metric: Metric }) {
         className="border-card-divider min-w-0 border-r px-3 py-2 last:border-r-0 max-lg:border-r-0"
         aria-hidden
       >
-        <div className="grid min-h-[68px] grid-cols-[minmax(6.5rem,1fr)_auto_1fr_0.75fr] items-center gap-x-2">
-          <div className="bg-card-placeholder h-2.5 w-3/4 rounded-full" />
-          <div className="bg-card-placeholder h-5 w-9 rounded-full" />
-          <div className="space-y-1">
+        <div className="grid min-h-17 grid-cols-12 items-center gap-x-2">
+          <div className="bg-card-placeholder col-span-4 h-2.5 w-3/4 rounded-full" />
+          <div className="bg-card-placeholder col-span-2 h-5 w-9 rounded-full" />
+          <div className="col-span-4 space-y-1">
             <div className="bg-card-placeholder h-2.5 rounded-full" />
             <div className="bg-card-placeholder h-2 w-2/3 rounded-full" />
           </div>
-          <div className="space-y-1">
+          <div className="col-span-2 space-y-1">
             <div className="bg-card-placeholder h-2.5 rounded-full" />
             <div className="bg-card-placeholder h-2 w-1/2 rounded-full" />
           </div>
@@ -89,22 +89,22 @@ function MetricBlock({ label, metric }: { label: string; metric: Metric }) {
 
   return (
     <div className="border-card-divider min-w-0 border-r px-3 py-2 last:border-r-0 max-lg:border-r-0">
-      <div className="grid min-h-[68px] grid-cols-[minmax(6.5rem,1fr)_auto_1fr_0.75fr] items-center gap-x-2">
-        <div className="text-card-muted flex flex-col text-[12px] text-center leading-[1.05]">
+      <div className="grid min-h-17 grid-cols-12 items-center gap-x-2">
+        <div className="text-card-muted col-span-4 flex flex-col text-[12px] text-center leading-[1.05]">
           {label.split("\n").map((line) => (
             <span key={line}>{line}</span>
           ))}
         </div>
 
         <button
-          className="bg-toggle-on inline-flex h-5 w-9 shrink-0 items-center justify-end rounded-full border-0 p-0.5"
+          className="bg-toggle-on col-span-2 inline-flex h-5 w-9 shrink-0 items-center justify-end rounded-full border-0 p-0.5"
           type="button"
           aria-label={`${label} enabled`}
         >
           <span className="h-4 w-4 rounded-full bg-white" />
         </button>
 
-        <div className="min-w-0">
+        <div className="col-span-4 min-w-0">
           <div
             className="bg-card-track h-3 min-w-0 overflow-hidden rounded-full"
             role="progressbar"
@@ -125,7 +125,7 @@ function MetricBlock({ label, metric }: { label: string; metric: Metric }) {
           <div className="text-body text-[12px] text-card-muted mt-1 text-center leading-none">{`${metric.correct} / ${metric.total}`}</div>
         </div>
 
-        <div className="min-w-0">
+        <div className="col-span-2 min-w-0">
           <div
             className="bg-card-track h-3 w-full overflow-hidden rounded-full"
             role="progressbar"
@@ -161,14 +161,14 @@ function SubpartsSkeleton() {
           key={`subpart-skeleton-${index}`}
           className="border-card-divider min-w-0 border-r px-3 py-2 last:border-r-0 max-lg:border-r-0"
         >
-          <div className="grid min-h-17 grid-cols-[minmax(6.5rem,1fr)_auto_1fr_0.75fr] items-center gap-x-2">
-            <div className="bg-card-skeleton h-2.5 w-3/4 animate-pulse rounded-full motion-reduce:animate-none" />
-            <div className="bg-card-skeleton h-5 w-9 animate-pulse rounded-full motion-reduce:animate-none" />
-            <div className="space-y-1">
+          <div className="grid min-h-17 grid-cols-12 items-center gap-x-2">
+            <div className="bg-card-skeleton col-span-4 h-2.5 w-3/4 animate-pulse rounded-full motion-reduce:animate-none" />
+            <div className="bg-card-skeleton col-span-2 h-5 w-9 animate-pulse rounded-full motion-reduce:animate-none" />
+            <div className="col-span-4 space-y-1">
               <div className="bg-card-skeleton h-2.5 w-full animate-pulse rounded-full motion-reduce:animate-none" />
               <div className="bg-card-skeleton h-2 w-2/3 animate-pulse rounded-full motion-reduce:animate-none" />
             </div>
-            <div className="space-y-1">
+            <div className="col-span-2 space-y-1">
               <div className="bg-card-skeleton h-2.5 w-full animate-pulse rounded-full motion-reduce:animate-none" />
               <div className="bg-card-skeleton h-2 w-1/2 animate-pulse rounded-full motion-reduce:animate-none" />
             </div>
@@ -260,7 +260,7 @@ function AssessmentCard({
       {isSubpartsLoading && !subparts ? (
         <SubpartsSkeleton />
       ) : subparts ? (
-        <div className="border-card-divider grid grid-cols-4 border-t max-lg:grid-cols-1">
+        <div className="border-card-divider grid grid-cols-4 max-lg:grid-cols-1">
           {metricGroups.map((group) => (
             <MetricBlock
               key={group.key}
