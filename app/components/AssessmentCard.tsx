@@ -95,16 +95,15 @@ export function AssessmentCard({
         </div>
 
         <button
-          className="text-body bg-cta-blue h-9 min-w-24 cursor-pointer rounded-full border-0 px-4 text-white"
+          className="text-body bg-cta-blue h-9 min-w-24 cursor-pointer items-center rounded-full border-0 px-4 text-white"
           type="button"
           onClick={handleMonitorClick}
           disabled={isMonitoring}
           aria-busy={isMonitoring}
         >
           {isMonitoring ? (
-            <span className="inline-flex items-center gap-1.5">
-              <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-white/60 border-t-white" />
-              Loading
+            <span className="flex items-center justify-center">
+              <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/60 border-t-white" />
             </span>
           ) : (
             "Monitor"
@@ -119,11 +118,12 @@ export function AssessmentCard({
       {isSubpartsLoading && !subparts ? (
         <SubpartsSkeleton />
       ) : subparts ? (
-        <div className="border-card-divider grid grid-cols-4 max-lg:grid-cols-1">
+        <div className="border-card-divider flex items-stretch max-lg:flex-col">
           {metricGroups.map((group) => (
             <MetricBlock
               key={group.key}
               label={group.label}
+              className={`flex-1 ${group.key === "formative" ? "border-r-0" : ""}`}
               metric={{
                 ...metricValues[group.key],
                 enabled:
@@ -131,8 +131,28 @@ export function AssessmentCard({
                   metricValues[group.key].enabled,
               }}
               onToggle={() => toggleMetric(group.key)}
+              showMastery={group.key !== "lesson"}
             />
           ))}
+
+          <div
+            className="text-body text-card-muted inline-flex shrink-0 items-center justify-center gap-1 px-2 py-1.5 max-lg:justify-start"
+            aria-label="Peer interactions"
+          >
+            <Image
+              src="/icons/person.svg"
+              alt="People"
+              width={16}
+              height={16}
+            />
+            <Image
+              src="/icons/reload.svg"
+              alt="Refresh"
+              width={16}
+              height={16}
+            />
+            <span>{subparts.peerCount}</span>
+          </div>
         </div>
       ) : null}
     </article>

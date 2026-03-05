@@ -6,10 +6,14 @@ export function MetricBlock({
   label,
   metric,
   onToggle,
+  showMastery = true,
+  className,
 }: {
   label: string;
   metric: Metric;
   onToggle: () => void;
+  showMastery?: boolean;
+  className?: string;
 }) {
   const completionRef = useRef<HTMLSpanElement | null>(null);
   const masteryRef = useRef<HTMLSpanElement | null>(null);
@@ -31,19 +35,27 @@ export function MetricBlock({
       { duration: 700, easing: "ease-out" },
     );
 
-    masteryRef.current?.animate(
-      [{ width: "0%" }, { width: `${masteryPercent}%` }],
-      { duration: 700, easing: "ease-out" },
-    );
-  }, [completionPercent, masteryPercent]);
+    if (showMastery) {
+      masteryRef.current?.animate(
+        [{ width: "0%" }, { width: `${masteryPercent}%` }],
+        { duration: 700, easing: "ease-out" },
+      );
+    }
+  }, [completionPercent, masteryPercent, showMastery]);
 
   const switchBg = metric.enabled ? "bg-toggle-on" : "bg-card-placeholder";
   const thumbTranslate = metric.enabled ? "translate-x-4" : "translate-x-0";
   const trackBg = "bg-card-track";
 
   return (
-    <div className="border-card-divider min-w-0 border-r px-3 py-2 last:border-r-0 max-lg:border-r-0">
-      <div className="grid min-h-17 grid-cols-12 items-center gap-x-2">
+    <div
+      className={`border-card-divider min-w-0 border-r px-3 py-2 last:border-r-0 max-lg:border-r-0 ${className ?? ""}`}
+    >
+      <div
+        className={`grid min-h-17 items-center gap-x-2 ${
+          showMastery ? "grid-cols-12" : "grid-cols-10"
+        }`}
+      >
         <div className="text-card-muted col-span-4 flex flex-col text-[12px] text-center leading-[1.05]">
           {label}
         </div>
@@ -82,27 +94,29 @@ export function MetricBlock({
           <div className="text-body text-[12px] text-card-muted mt-1 text-center leading-none">{`${metric.correct} / ${metric.total}`}</div>
         </div>
 
-        <div className="col-span-2 min-w-0">
-          <div
-            className={`${trackBg} h-3 w-full overflow-hidden rounded-full`}
-            role="progressbar"
-            aria-label={`${label} mastery`}
-            aria-valuemin={0}
-            aria-valuemax={100}
-            aria-valuenow={metric.percent}
-          >
-            <span
-              ref={masteryRef}
-              className="block h-full rounded-full"
-              style={{
-                width: `${masteryPercent}%`,
-                backgroundColor: colors.primary.purple,
-              }}
-            />
-          </div>
+        {showMastery && (
+          <div className="col-span-2 min-w-0">
+            <div
+              className={`${trackBg} h-3 w-full overflow-hidden rounded-full`}
+              role="progressbar"
+              aria-label={`${label} mastery`}
+              aria-valuemin={0}
+              aria-valuemax={100}
+              aria-valuenow={metric.percent}
+            >
+              <span
+                ref={masteryRef}
+                className="block h-full rounded-full"
+                style={{
+                  width: `${masteryPercent}%`,
+                  backgroundColor: colors.primary.purple,
+                }}
+              />
+            </div>
 
-          <div className="text-body text-[12px] text-card-muted mt-1 text-center leading-none">{`${metric.percent}%`}</div>
-        </div>
+            <div className="text-body text-[12px] text-card-muted mt-1 text-center leading-none">{`${metric.percent}%`}</div>
+          </div>
+        )}
       </div>
     </div>
   );
