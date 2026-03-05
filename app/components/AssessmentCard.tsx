@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { useState } from "react";
 import { metricGroups } from "../constants/quiz";
 import { MetricBlock } from "./MetricBlock";
 import { SubpartsSkeleton } from "./SubpartsSkeleton";
@@ -25,6 +26,29 @@ export function AssessmentCard({
     independent: subparts?.independent ?? defaultMetric,
     continuous: subparts?.continuous ?? defaultMetric,
     formative: subparts?.formative ?? defaultMetric,
+  };
+
+  type MetricKey = (typeof metricGroups)[number]["key"];
+
+  const [metricEnabledOverrides, setMetricEnabledOverrides] = useState<
+    Partial<Record<MetricKey, boolean>>
+  >({});
+  const [isMonitoring, setIsMonitoring] = useState(false);
+
+  const toggleMetric = (key: MetricKey) => {
+    const currentEnabled =
+      metricEnabledOverrides[key] ?? metricValues[key].enabled;
+
+    setMetricEnabledOverrides((previous) => ({
+      ...previous,
+      [key]: !currentEnabled,
+    }));
+  };
+
+  const handleMonitorClick = async () => {
+    setIsMonitoring(true);
+    await new Promise((resolve) => setTimeout(resolve, 700));
+    setIsMonitoring(false);
   };
 
   return (
@@ -73,8 +97,18 @@ export function AssessmentCard({
         <button
           className="text-body bg-cta-blue h-9 min-w-24 cursor-pointer rounded-full border-0 px-4 text-white"
           type="button"
+          onClick={handleMonitorClick}
+          disabled={isMonitoring}
+          aria-busy={isMonitoring}
         >
-          Monitor
+          {isMonitoring ? (
+            <span className="inline-flex items-center gap-1.5">
+              <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-white/60 border-t-white" />
+              Loading
+            </span>
+          ) : (
+            "Monitor"
+          )}
         </button>
       </div>
 
@@ -90,7 +124,13 @@ export function AssessmentCard({
             <MetricBlock
               key={group.key}
               label={group.label}
-              metric={metricValues[group.key]}
+              metric={{
+                ...metricValues[group.key],
+                enabled:
+                  metricEnabledOverrides[group.key] ??
+                  metricValues[group.key].enabled,
+              }}
+              onToggle={() => toggleMetric(group.key)}
             />
           ))}
         </div>

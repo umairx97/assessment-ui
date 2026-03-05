@@ -1,55 +1,68 @@
 import { colors } from "../colors";
+import { useEffect, useRef } from "react";
 import type { Metric } from "../types/quiz";
 
 export function MetricBlock({
   label,
   metric,
+  onToggle,
 }: {
   label: string;
   metric: Metric;
+  onToggle: () => void;
 }) {
-  if (!metric.enabled) {
-    return (
-      <div
-        className="border-card-divider min-w-0 border-r px-3 py-2 last:border-r-0 max-lg:border-r-0"
-        aria-hidden
-      >
-        <div className="grid min-h-17 grid-cols-12 items-center gap-x-2">
-          <div className="bg-card-placeholder col-span-4 h-2.5 w-3/4 rounded-full" />
-          <div className="bg-card-placeholder col-span-2 h-5 w-9 rounded-full" />
-          <div className="col-span-4 space-y-1">
-            <div className="bg-card-placeholder h-2.5 rounded-full" />
-            <div className="bg-card-placeholder h-2 w-2/3 rounded-full" />
-          </div>
-          <div className="col-span-2 space-y-1">
-            <div className="bg-card-placeholder h-2.5 rounded-full" />
-            <div className="bg-card-placeholder h-2 w-1/2 rounded-full" />
-          </div>
-        </div>
-      </div>
+  const completionRef = useRef<HTMLSpanElement | null>(null);
+  const masteryRef = useRef<HTMLSpanElement | null>(null);
+
+  const completionPercent = Math.max(0, Math.min(100, metric.percent));
+  const masteryPercent = Math.max(0, Math.min(100, metric.percent));
+
+  useEffect(() => {
+    const prefersReducedMotion = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+
+    if (prefersReducedMotion) {
+      return;
+    }
+
+    completionRef.current?.animate(
+      [{ width: "0%" }, { width: `${completionPercent}%` }],
+      { duration: 700, easing: "ease-out" },
     );
-  }
+
+    masteryRef.current?.animate(
+      [{ width: "0%" }, { width: `${masteryPercent}%` }],
+      { duration: 700, easing: "ease-out" },
+    );
+  }, [completionPercent, masteryPercent]);
+
+  const switchBg = metric.enabled ? "bg-toggle-on" : "bg-card-placeholder";
+  const thumbTranslate = metric.enabled ? "translate-x-4" : "translate-x-0";
+  const trackBg = "bg-card-track";
 
   return (
     <div className="border-card-divider min-w-0 border-r px-3 py-2 last:border-r-0 max-lg:border-r-0">
       <div className="grid min-h-17 grid-cols-12 items-center gap-x-2">
         <div className="text-card-muted col-span-4 flex flex-col text-[12px] text-center leading-[1.05]">
-          {label.split("\n").map((line) => (
-            <span key={line}>{line}</span>
-          ))}
+          {label}
         </div>
 
         <button
-          className="bg-toggle-on col-span-2 inline-flex h-5 w-9 shrink-0 items-center justify-end rounded-full border-0 p-0.5"
+          className={`${switchBg} col-span-2 inline-flex h-5 w-9 shrink-0 items-center rounded-full border-0 p-0.5 transition-colors duration-300 ease-out`}
           type="button"
-          aria-label={`${label} enabled`}
+          onClick={onToggle}
+          aria-label={`Toggle ${label}`}
+          aria-pressed={metric.enabled}
         >
-          <span className="h-4 w-4 rounded-full bg-white" />
+          <span
+            className={`${thumbTranslate} h-4 w-4 rounded-full bg-white transition-transform duration-300 ease-out`}
+          />
         </button>
 
         <div className="col-span-4 min-w-0">
           <div
-            className="bg-card-track h-3 min-w-0 overflow-hidden rounded-full"
+            className={`${trackBg} h-3 min-w-0 overflow-hidden rounded-full`}
             role="progressbar"
             aria-label={`${label} completion`}
             aria-valuemin={0}
@@ -57,9 +70,10 @@ export function MetricBlock({
             aria-valuenow={metric.correct}
           >
             <span
-              className="block h-full rounded-full transition-all duration-700 ease-out motion-reduce:transition-none"
+              ref={completionRef}
+              className="block h-full rounded-full"
               style={{
-                width: `${Math.max(0, Math.min(100, metric.percent))}%`,
+                width: `${completionPercent}%`,
                 backgroundColor: colors.primary.blue,
               }}
             />
@@ -70,7 +84,7 @@ export function MetricBlock({
 
         <div className="col-span-2 min-w-0">
           <div
-            className="bg-card-track h-3 w-full overflow-hidden rounded-full"
+            className={`${trackBg} h-3 w-full overflow-hidden rounded-full`}
             role="progressbar"
             aria-label={`${label} mastery`}
             aria-valuemin={0}
@@ -78,9 +92,10 @@ export function MetricBlock({
             aria-valuenow={metric.percent}
           >
             <span
-              className="block h-full rounded-full transition-all duration-700 ease-out motion-reduce:transition-none"
+              ref={masteryRef}
+              className="block h-full rounded-full"
               style={{
-                width: `${Math.max(0, Math.min(100, metric.percent))}%`,
+                width: `${masteryPercent}%`,
                 backgroundColor: colors.primary.purple,
               }}
             />
