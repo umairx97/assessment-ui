@@ -31,6 +31,7 @@
   --text-label--line-height: 1rem;
   --spacing-control-h: 1.625rem;
   --spacing-control-w: 14.6875rem;
+  --spacing-list-max-h: calc(100vh - 15rem);
   --font-sans: var(--font-plus-jakarta-sans);
 }
 

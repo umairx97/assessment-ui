@@ -368,12 +368,12 @@ export default function Home() {
 
   return (
     <main
-      className="min-h-screen px-5 py-4"
+      className="min-h-screen px-5 py-4 bg-white!"
       style={{ backgroundColor: colors.secondary.gray }}
     >
-      <section className="mx-auto max-w-7xl">
-        <header className="mb-3 grid grid-cols-[1fr_auto_auto] items-center gap-3 max-xl:grid-cols-1">
-          <div className="flex items-center gap-4">
+      <section className="mx-auto max-w-7xl bg-white">
+        <header className="mb-3 grid grid-cols-[1fr_auto_auto] items-center max-xl:grid-cols-1">
+          <div className="flex items-center justify-between gap-4">
             <div>
               <div className="flex gap-4 items-center">
                 <h1 className="text-xl leading-[1.15] font-bold">
@@ -402,19 +402,26 @@ export default function Home() {
             </button>
 
             <div className="gap-4 flex items-end">
-              <label className="relative" htmlFor="search-assessment">
+              <label
+                className="relative flex gap-2"
+                htmlFor="search-assessment"
+              >
+                <Image
+                  src="/icons/search.svg"
+                  alt="Search"
+                  width={16}
+                  height={16}
+                />
                 <span
                   aria-hidden
                   className="text-search-icon text-body absolute top-1/2 left-3 -translate-y-1/2"
-                >
-                  ⌕
-                </span>
+                ></span>
                 <input
                   id="search-assessment"
                   value={query}
                   onChange={(event) => setQuery(event.target.value)}
                   placeholder="Search"
-                  className="border-field-border text-field-text text-label h-control-h w-control-w rounded-lg border bg-white pr-3.5 pl-8"
+                  className="border-field-border text-field-text text-label h-control-h w-control-w rounded-lg border bg-white pr-3.5 pl-2"
                 />
               </label>
 
@@ -438,7 +445,7 @@ export default function Home() {
 
         <div className="relative">
           <div
-            className="grid max-h-[calc(100vh-15rem)] gap-2.5 overflow-y-auto pr-1"
+            className="mt-10 grid max-h-list-max-h gap-2.5 overflow-y-auto pr-1"
             role="list"
             aria-live="polite"
           >
