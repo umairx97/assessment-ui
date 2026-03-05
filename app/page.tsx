@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useQuery } from "@tanstack/react-query";
+import axios from "axios";
 import { useMemo, useState } from "react";
 import { colors } from "./colors";
 
@@ -12,12 +13,16 @@ type Metric = {
   enabled: boolean;
 };
 
-type Assessment = {
+type Quiz = {
   id: string;
   title: string;
   description: string;
   scheduledDate: string | null;
   lastActivity: string;
+};
+
+type QuizSubparts = {
+  id: string;
   lesson: Metric;
   independent: Metric;
   continuous: Metric;
@@ -25,8 +30,12 @@ type Assessment = {
   peerCount: number;
 };
 
-type ApiResponse = {
-  assessments: Assessment[];
+type QuizzesApiResponse = {
+  quizzes: Quiz[];
+};
+
+type SubpartsApiResponse = {
+  subparts: QuizSubparts[];
 };
 
 const metricGroups = [
@@ -36,14 +45,14 @@ const metricGroups = [
   { key: "formative", label: "Formative\nQuiz" },
 ] as const;
 
-async function fetchAssessments(): Promise<Assessment[]> {
-  const response = await fetch("/api/assessments", { cache: "no-store" });
-  if (!response.ok) {
-    throw new Error("Failed to load assessments");
-  }
+async function fetchQuizzes(): Promise<Quiz[]> {
+  const { data } = await axios.get<QuizzesApiResponse>("/api/quizzes");
+  return data.quizzes;
+}
 
-  const data = (await response.json()) as ApiResponse;
-  return data.assessments;
+async function fetchQuizSubparts(): Promise<QuizSubparts[]> {
+  const { data } = await axios.get<SubpartsApiResponse>("/api/quiz-subparts");
+  return data.subparts;
 }
 
 function parseScheduledDate(value: string | null) {
@@ -59,27 +68,34 @@ function MetricBlock({ label, metric }: { label: string; metric: Metric }) {
   if (!metric.enabled) {
     return (
       <div
-        className="border-card-divider min-w-0 border-r px-2 py-1.5 last:border-r-0 max-lg:border-r-0"
+        className="border-card-divider min-w-0 border-r px-3 py-2 last:border-r-0 max-lg:border-r-0"
         aria-hidden
       >
-        <div className="grid min-h-14 content-center gap-2">
-          <div className="bg-card-placeholder h-2 rounded-full" />
-          <div className="bg-card-placeholder h-2 w-[45%] rounded-full" />
-          <div className="bg-card-placeholder h-2 rounded-full" />
+        <div className="grid min-h-[68px] grid-cols-[minmax(6.5rem,1fr)_auto_1fr_0.75fr] items-center gap-x-2">
+          <div className="bg-card-placeholder h-2.5 w-3/4 rounded-full" />
+          <div className="bg-card-placeholder h-5 w-9 rounded-full" />
+          <div className="space-y-1">
+            <div className="bg-card-placeholder h-2.5 rounded-full" />
+            <div className="bg-card-placeholder h-2 w-2/3 rounded-full" />
+          </div>
+          <div className="space-y-1">
+            <div className="bg-card-placeholder h-2.5 rounded-full" />
+            <div className="bg-card-placeholder h-2 w-1/2 rounded-full" />
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="border-card-divider min-w-0 border-r px-2 py-1.5 last:border-r-0 max-lg:border-r-0">
-      <div className="text-card-muted flex flex-col text-xs leading-none">
-        {label.split("\n").map((line) => (
-          <span key={line}>{line}</span>
-        ))}
-      </div>
+    <div className="border-card-divider min-w-0 border-r px-3 py-2 last:border-r-0 max-lg:border-r-0">
+      <div className="grid min-h-[68px] grid-cols-[minmax(6.5rem,1fr)_auto_1fr_0.75fr] items-center gap-x-2">
+        <div className="text-card-muted flex flex-col text-[12px] text-center leading-[1.05]">
+          {label.split("\n").map((line) => (
+            <span key={line}>{line}</span>
+          ))}
+        </div>
 
-      <div className="mt-1 flex min-w-0 items-center gap-1.5">
         <button
           className="bg-toggle-on inline-flex h-5 w-9 shrink-0 items-center justify-end rounded-full border-0 p-0.5"
           type="button"
@@ -88,89 +104,145 @@ function MetricBlock({ label, metric }: { label: string; metric: Metric }) {
           <span className="h-4 w-4 rounded-full bg-white" />
         </button>
 
-        <div className="text-body text-card-muted shrink-0 whitespace-nowrap leading-none">{`${metric.correct} / ${metric.total}`}</div>
+        <div className="min-w-0">
+          <div
+            className="bg-card-track h-3 min-w-0 overflow-hidden rounded-full"
+            role="progressbar"
+            aria-label={`${label} completion`}
+            aria-valuemin={0}
+            aria-valuemax={metric.total}
+            aria-valuenow={metric.correct}
+          >
+            <span
+              className="block h-full rounded-full transition-all duration-700 ease-out motion-reduce:transition-none"
+              style={{
+                width: `${Math.max(0, Math.min(100, metric.percent))}%`,
+                backgroundColor: colors.primary.blue,
+              }}
+            />
+          </div>
 
-        <div
-          className="bg-card-track h-3 min-w-0 flex-1 overflow-hidden rounded-full"
-          role="progressbar"
-          aria-label={`${label} completion`}
-          aria-valuemin={0}
-          aria-valuemax={metric.total}
-          aria-valuenow={metric.correct}
-        >
-          <span
-            className="block h-full rounded-full transition-all duration-700 ease-out motion-reduce:transition-none"
-            style={{
-              width: `${Math.max(0, Math.min(100, metric.percent))}%`,
-              backgroundColor: colors.primary.blue,
-            }}
-          />
+          <div className="text-body text-[12px] text-card-muted mt-1 text-center leading-none">{`${metric.correct} / ${metric.total}`}</div>
         </div>
 
-        <div
-          className="bg-card-track h-3 w-8 shrink-0 overflow-hidden rounded-full"
-          role="progressbar"
-          aria-label={`${label} mastery`}
-          aria-valuemin={0}
-          aria-valuemax={100}
-          aria-valuenow={metric.percent}
-        >
-          <span
-            className="block h-full rounded-full transition-all duration-700 ease-out motion-reduce:transition-none"
-            style={{
-              width: `${Math.max(0, Math.min(100, metric.percent))}%`,
-              backgroundColor: colors.primary.purple,
-            }}
-          />
-        </div>
+        <div className="min-w-0">
+          <div
+            className="bg-card-track h-3 w-full overflow-hidden rounded-full"
+            role="progressbar"
+            aria-label={`${label} mastery`}
+            aria-valuemin={0}
+            aria-valuemax={100}
+            aria-valuenow={metric.percent}
+          >
+            <span
+              className="block h-full rounded-full transition-all duration-700 ease-out motion-reduce:transition-none"
+              style={{
+                width: `${Math.max(0, Math.min(100, metric.percent))}%`,
+                backgroundColor: colors.primary.purple,
+              }}
+            />
+          </div>
 
-        <div className="text-body text-card-muted shrink-0 whitespace-nowrap leading-none">{`${metric.percent}%`}</div>
+          <div className="text-body text-[12px] text-card-muted mt-1 text-center leading-none">{`${metric.percent}%`}</div>
+        </div>
       </div>
     </div>
   );
 }
 
-function AssessmentCard({ assessment }: { assessment: Assessment }) {
+function SubpartsSkeleton() {
+  return (
+    <div
+      className="border-card-divider grid grid-cols-4 border-t max-lg:grid-cols-1"
+      aria-hidden
+    >
+      {Array.from({ length: 4 }).map((_, index) => (
+        <div
+          key={`subpart-skeleton-${index}`}
+          className="border-card-divider min-w-0 border-r px-3 py-2 last:border-r-0 max-lg:border-r-0"
+        >
+          <div className="grid min-h-17 grid-cols-[minmax(6.5rem,1fr)_auto_1fr_0.75fr] items-center gap-x-2">
+            <div className="bg-card-skeleton h-2.5 w-3/4 animate-pulse rounded-full motion-reduce:animate-none" />
+            <div className="bg-card-skeleton h-5 w-9 animate-pulse rounded-full motion-reduce:animate-none" />
+            <div className="space-y-1">
+              <div className="bg-card-skeleton h-2.5 w-full animate-pulse rounded-full motion-reduce:animate-none" />
+              <div className="bg-card-skeleton h-2 w-2/3 animate-pulse rounded-full motion-reduce:animate-none" />
+            </div>
+            <div className="space-y-1">
+              <div className="bg-card-skeleton h-2.5 w-full animate-pulse rounded-full motion-reduce:animate-none" />
+              <div className="bg-card-skeleton h-2 w-1/2 animate-pulse rounded-full motion-reduce:animate-none" />
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function AssessmentCard({
+  quiz,
+  subparts,
+  isSubpartsLoading,
+}: {
+  quiz: Quiz;
+  subparts?: QuizSubparts;
+  isSubpartsLoading: boolean;
+}) {
+  const defaultMetric: Metric = {
+    correct: 0,
+    total: 25,
+    percent: 0,
+    enabled: false,
+  };
+
   const metricValues = {
-    lesson: assessment.lesson,
-    independent: assessment.independent,
-    continuous: assessment.continuous,
-    formative: assessment.formative,
+    lesson: subparts?.lesson ?? defaultMetric,
+    independent: subparts?.independent ?? defaultMetric,
+    continuous: subparts?.continuous ?? defaultMetric,
+    formative: subparts?.formative ?? defaultMetric,
   };
 
   return (
     <article className="border-card-border rounded-xl border px-3.5 py-2.5 bg-card-background">
       <div className="grid grid-cols-[minmax(20rem,1.5fr)_auto_auto_auto] items-center gap-2.5 max-lg:grid-cols-1">
-        <div className="flex items-center gap-2">
-          <Image src="/icons/copy.svg" alt="Copy icon" width={20} height={20} />
-          <h2 className="text-title text-base leading-[1.15] font-bold">
-            {assessment.title}
-          </h2>
-          {assessment.id === "3n12" && (
+        <div className="grid grid-cols-3">
+          <div className="flex items-center gap-4">
             <Image
-              src="/icons/muscles.svg"
-              alt="Strength indicator"
-              width={16}
-              height={16}
+              src="/icons/copy.svg"
+              alt="Copy icon"
+              width={20}
+              height={20}
             />
-          )}
-        </div>
-
-        <div className="flex items-center gap-1.5">
-          <Image
-            src="/icons/calendar.svg"
-            alt="Calendar"
-            width={18}
-            height={18}
-          />
-          <div className="text-body text-card-muted leading-[1.1]">
-            {assessment.scheduledDate ?? "Not Scheduled"}
+            <h2 className="text-title text-base leading-[1.15] font-bold">
+              {quiz.title}
+            </h2>
+            {quiz.id === "3n12" && (
+              <Image
+                src="/icons/muscles.svg"
+                alt="Strength indicator"
+                width={16}
+                height={16}
+              />
+            )}
           </div>
-        </div>
+          <div className="flex items-center gap-6">
+            <div className="flex items-center gap-1.5">
+              <Image
+                src="/icons/calendar.svg"
+                alt="Calendar"
+                width={18}
+                height={18}
+              />
+              <div className="text-body text-card-muted leading-[1.1]">
+                {quiz.scheduledDate ?? "Not Scheduled"}
+              </div>
+            </div>
 
-        <div className="text-body text-card-muted leading-[1.1]">
-          <div>Last Activity</div>
-          <div>{assessment.lastActivity}</div>
+            <div className="text-body text-card-muted text-center leading-[1.1]">
+              <div>Last Activity</div>
+              <div>{quiz.lastActivity}</div>
+            </div>
+          </div>
         </div>
 
         <button
@@ -182,39 +254,43 @@ function AssessmentCard({ assessment }: { assessment: Assessment }) {
       </div>
 
       <p className="text-body text-card-muted mt-2 mb-2.5 ml-7 leading-[1.35]">
-        {assessment.description}
+        {quiz.description}
       </p>
 
-      <div className="border-card-divider grid grid-cols-4 border-t max-lg:grid-cols-1">
-        {metricGroups.map((group) => (
-          <MetricBlock
-            key={group.key}
-            label={group.label}
-            metric={metricValues[group.key]}
-          />
-        ))}
+      {isSubpartsLoading && !subparts ? (
+        <SubpartsSkeleton />
+      ) : subparts ? (
+        <div className="border-card-divider grid grid-cols-4 border-t max-lg:grid-cols-1">
+          {metricGroups.map((group) => (
+            <MetricBlock
+              key={group.key}
+              label={group.label}
+              metric={metricValues[group.key]}
+            />
+          ))}
 
-        {assessment.peerCount > 0 && (
-          <div
-            className="text-body text-card-muted border-card-divider inline-flex items-center justify-end gap-1 border-r p-1.5 last:border-r-0 max-lg:justify-start max-lg:border-r-0"
-            aria-label="Peer interactions"
-          >
-            <Image
-              src="/icons/person.svg"
-              alt="People"
-              width={16}
-              height={16}
-            />
-            <Image
-              src="/icons/reload.svg"
-              alt="Refresh"
-              width={16}
-              height={16}
-            />
-            <span>{assessment.peerCount}</span>
-          </div>
-        )}
-      </div>
+          {/* {(subparts?.peerCount ?? 0) > 0 && (
+            <div
+              className="text-body text-card-muted border-card-divider inline-flex items-center justify-end gap-1 border-r p-1.5 last:border-r-0 max-lg:justify-start max-lg:border-r-0"
+              aria-label="Peer interactions"
+            >
+              <Image
+                src="/icons/person.svg"
+                alt="People"
+                width={16}
+                height={16}
+              />
+              <Image
+                src="/icons/reload.svg"
+                alt="Refresh"
+                width={16}
+                height={16}
+              />
+              <span>{subparts?.peerCount}</span>
+            </div>
+          )} */}
+        </div>
+      ) : null}
     </article>
   );
 }
@@ -243,24 +319,38 @@ export default function Home() {
   const [sortBy, setSortBy] = useState<"scheduled" | "activity">("scheduled");
 
   const {
-    data: assessments = [],
-    isLoading,
-    isError,
+    data: quizzes = [],
+    isLoading: isQuizzesLoading,
+    isError: isQuizzesError,
   } = useQuery({
-    queryKey: ["assessments"],
-    queryFn: fetchAssessments,
+    queryKey: ["quizzes"],
+    queryFn: fetchQuizzes,
   });
 
-  const visibleAssessments = useMemo(() => {
+  const {
+    data: subparts = [],
+    isLoading: isSubpartsLoading,
+    isError: isSubpartsError,
+  } = useQuery({
+    queryKey: ["quiz-subparts"],
+    queryFn: fetchQuizSubparts,
+  });
+
+  const subpartsByQuizId = useMemo(
+    () => new Map(subparts.map((item) => [item.id, item])),
+    [subparts],
+  );
+
+  const visibleQuizzes = useMemo(() => {
     const lowered = query.trim().toLowerCase();
-    const filtered = assessments.filter((assessment) => {
+    const filtered = quizzes.filter((quiz) => {
       if (!lowered) {
         return true;
       }
 
       return (
-        assessment.title.toLowerCase().includes(lowered) ||
-        assessment.description.toLowerCase().includes(lowered)
+        quiz.title.toLowerCase().includes(lowered) ||
+        quiz.description.toLowerCase().includes(lowered)
       );
     });
 
@@ -274,7 +364,7 @@ export default function Home() {
         parseScheduledDate(right.scheduledDate)
       );
     });
-  }, [assessments, query, sortBy]);
+  }, [quizzes, query, sortBy]);
 
   return (
     <main
@@ -311,36 +401,38 @@ export default function Home() {
               </span>
             </button>
 
-            <label className="relative" htmlFor="search-assessment">
-              <span
-                aria-hidden
-                className="text-search-icon text-body absolute top-1/2 left-3 -translate-y-1/2"
-              >
-                ⌕
-              </span>
-              <input
-                id="search-assessment"
-                value={query}
-                onChange={(event) => setQuery(event.target.value)}
-                placeholder="Search"
-                className="border-field-border text-field-text text-label h-control-h w-control-w rounded-lg border bg-white pr-3.5 pl-8"
-              />
-            </label>
+            <div className="gap-4 flex items-end">
+              <label className="relative" htmlFor="search-assessment">
+                <span
+                  aria-hidden
+                  className="text-search-icon text-body absolute top-1/2 left-3 -translate-y-1/2"
+                >
+                  ⌕
+                </span>
+                <input
+                  id="search-assessment"
+                  value={query}
+                  onChange={(event) => setQuery(event.target.value)}
+                  placeholder="Search"
+                  className="border-field-border text-field-text text-label h-control-h w-control-w rounded-lg border bg-white pr-3.5 pl-8"
+                />
+              </label>
 
-            <label className="relative" htmlFor="sort-assessment">
-              <span className="sr-only">Sort assessments</span>
-              <select
-                id="sort-assessment"
-                value={sortBy}
-                onChange={(event) =>
-                  setSortBy(event.target.value as "scheduled" | "activity")
-                }
-                className="border-field-border text-field-text text-label h-control-h w-control-w rounded-lg border px-2.5"
-              >
-                <option value="scheduled">Sort By Scheduled</option>
-                <option value="activity">Sort By Last Activity</option>
-              </select>
-            </label>
+              <label className="relative" htmlFor="sort-assessment">
+                <span className="sr-only">Sort assessments</span>
+                <select
+                  id="sort-assessment"
+                  value={sortBy}
+                  onChange={(event) =>
+                    setSortBy(event.target.value as "scheduled" | "activity")
+                  }
+                  className="border-field-border bg-white text-field-text text-label h-control-h w-control-w rounded-lg border px-2.5"
+                >
+                  <option value="scheduled">Sort By Scheduled</option>
+                  <option value="activity">Sort By Last Activity</option>
+                </select>
+              </label>
+            </div>
           </div>
         </header>
 
@@ -350,7 +442,7 @@ export default function Home() {
             role="list"
             aria-live="polite"
           >
-            {isLoading && (
+            {isQuizzesLoading && (
               <>
                 <AssessmentSkeleton />
                 <AssessmentSkeleton />
@@ -358,17 +450,30 @@ export default function Home() {
               </>
             )}
 
-            {!isLoading && isError && (
-              <p className="text-body text-danger">Could not load quiz data.</p>
+            {!isQuizzesLoading && isQuizzesError && (
+              <p className="text-body text-danger">Could not load quiz list.</p>
             )}
 
-            {!isLoading &&
-              !isError &&
-              visibleAssessments.map((assessment) => (
-                <div key={assessment.id} role="listitem">
-                  <AssessmentCard assessment={assessment} />
+            {!isQuizzesLoading &&
+              !isQuizzesError &&
+              visibleQuizzes.map((quiz) => (
+                <div key={quiz.id} role="listitem">
+                  <AssessmentCard
+                    quiz={quiz}
+                    subparts={subpartsByQuizId.get(quiz.id)}
+                    isSubpartsLoading={isSubpartsLoading && !isSubpartsError}
+                  />
                 </div>
               ))}
+
+            {!isQuizzesLoading &&
+              !isQuizzesError &&
+              !isSubpartsLoading &&
+              isSubpartsError && (
+                <p className="text-body text-danger">
+                  Could not load quiz subparts.
+                </p>
+              )}
           </div>
         </div>
       </section>
